@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.Pair;
 import android.view.View;
 import android.widget.*;
 import android.Manifest;
@@ -29,14 +30,23 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.Random;
+
 import android.util.Log;
 
 public class MainActivity extends AppCompatActivity {
 
-    private TextView welcomeTV, fileSelTV, ttt;
+    private TextView welcomeTV, fileSelTV;
     private Button choose_fileBTN, uploadBTN;
+
+    private String file_contents;
 
 
     private static final int FILE_REQUEST_CODE = 1;
@@ -55,7 +65,6 @@ public class MainActivity extends AppCompatActivity {
         choose_fileBTN = (Button) findViewById(R.id.idBSelectFile);
         uploadBTN = (Button) findViewById(R.id.idBUpload);
 
-        ttt = (TextView) findViewById(R.id.textView2);
 
         choose_fileBTN.setOnClickListener(v -> {
             if (checkPermission()) {
@@ -65,7 +74,9 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-            fileChooserLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), this::handleFileSelectionResult);
+        fileChooserLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), this::handleFileSelectionResult);
+
+
 
     }
 
@@ -92,38 +103,29 @@ public class MainActivity extends AppCompatActivity {
         if (result.getResultCode() == RESULT_OK && result.getData() != null) {
             Uri fileUri = result.getData().getData();
 
-            //String temp = fileUri.getPath();
-            //String filePath = temp.substring(temp.indexOf("Download/")+9);
+            System.out.println("Gia na ddoyme");
 
-            fileSelTV.setText(fileUri.getPath());
-            //Toast.makeText(this, "Selected file: " + fileSelTV, Toast.LENGTH_SHORT).show();
+            fileSelTV.setText("File Successfully selected");
 
-            try {
-                printRes(fileUri.getPath());
-            }catch (IOException e){
-                e.printStackTrace();
-            }
+            this.file_contents = createFileString(fileUri);
+            System.out.println(file_contents);
+
+
+            uploadBTN.setVisibility(View.VISIBLE);
+            uploadBTN.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent = new Intent(MainActivity.this, Activity2.class);
+                    startActivity(intent);
+                }
+            });
+
+            Toast.makeText(this, "Selected file: " + fileUri.getPath(), Toast.LENGTH_LONG).show();
+
+
 
         }
     }
-
-
-    private void printRes(String path) throws IOException {
-        System.out.println("A");
-        FileReader txt = new FileReader(path);
-        BufferedReader txt_handler = new BufferedReader(txt);
-
-        String online;
-        online = txt_handler.readLine();
-
-        while ((online = txt_handler.readLine()) != null) {
-            Log.d("Tag", "-------------------");
-            Log.i("Tag", online);
-        }
-
-
-    }
-
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -136,6 +138,51 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show();
             }
         }
+    }
+
+    private String createFileString(Uri f_Uri){
+        StringBuilder sb = new StringBuilder();
+        InputStream inputStream = null;
+        try {
+            inputStream = getContentResolver().openInputStream(f_Uri);
+            InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+            BufferedReader br = new BufferedReader(inputStreamReader);
+
+            String line;
+            while ((line = br.readLine()) != null) {
+                sb.append(line);
+                sb.append("\n");
+            }
+
+            br.close();
+            inputStreamReader.close();
+            inputStream.close();
+        } catch (FileNotFoundException e) {
+            System.err.println("FileNotFoundException thrown");
+            e.printStackTrace();
+        } catch (IOException e) {
+            System.err.println("IOException thrown");
+            e.printStackTrace();
+        }
+
+
+        return sb.toString();
+
+    }
+
+    private String generateRandomString(int l){
+        String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        Random random = new Random();
+        StringBuilder sb = new StringBuilder(l);
+
+        for (int i = 0; i < l; i++) {
+            int randomIndex = random.nextInt(characters.length());
+            char randomChar = characters.charAt(randomIndex);
+            sb.append(randomChar);
+        }
+
+        return sb.toString();
+
     }
 
 
