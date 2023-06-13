@@ -4,20 +4,38 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/Black_cat"
     tools:context=".Activity2">
 
-    <TextView
-        android:id="@+id/textView2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="160dp"
-        android:layout_marginTop="315dp"
-        android:layout_marginEnd="193dp"
-        android:layout_marginBottom="397dp"
-        android:text="Iasona"
-        android:textSize="30dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+
+    <Button
+        android:id="@+id/idBTNGpxResults"
+        android:layout_width="260dp"
+        android:layout_height="53dp"
+        android:layout_marginTop="230dp"
+        android:backgroundTint="@color/white"
+        android:padding="10dp"
+        android:text="GPX RESULTS"
+        android:textSize="22dp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.529"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/idBTNTotalResults"
+        android:layout_width="260dp"
+        android:layout_height="53dp"
+        android:layout_marginTop="77dp"
+        android:layout_marginBottom="230dp"
+        android:backgroundTint="@color/white"
+        android:text="TOTAL RESULTS"
+        android:textSize="22dp"
+        android:padding="10dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.531"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/idBTNGpxResults" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
