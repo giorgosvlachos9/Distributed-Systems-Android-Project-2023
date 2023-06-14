@@ -9,6 +9,7 @@ public class GPX_results extends AppCompatActivity {
     private TextView gpx_resTV;
     private String username, gpx_results;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

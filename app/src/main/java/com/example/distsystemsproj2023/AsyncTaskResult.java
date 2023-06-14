@@ -8,16 +8,17 @@ import androidx.annotation.NonNull;
 import java.io.Serializable;
 
 public class AsyncTaskResult implements Serializable {
-    private String username, gpx_file_res, total_res, error;
+    private String username, gpx_file_res, user_total_res, server_total_res, error;
     private int total_gpxs, total_user_files;
 
 
     public AsyncTaskResult(){ this.error = "Error"; }
 
-    public AsyncTaskResult(String s1, String s2, String s3, int n1, int n2){
+    public AsyncTaskResult(String s1, String s2, String s3, String s4, int n1, int n2){
         this.username = s1;
         this.gpx_file_res = s2;
-        this.total_res = s3;
+        this.user_total_res = s3;
+        this.server_total_res = s4;
         this.total_gpxs = n1;
         this.total_user_files = n2;
     }
@@ -34,7 +35,9 @@ public class AsyncTaskResult implements Serializable {
         return gpx_file_res;
     }
 
-    public String getTotal_res() {
-        return total_res;
+    public String getUser_Total_res() {
+        return user_total_res;
     }
+
+    public String getServer_total_res() { return server_total_res; }
 }

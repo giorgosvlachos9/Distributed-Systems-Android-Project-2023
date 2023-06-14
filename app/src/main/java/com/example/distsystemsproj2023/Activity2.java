@@ -18,14 +18,18 @@ import android.os.Build;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.StringReader;
 import java.net.Socket;
 
 public class Activity2 extends AppCompatActivity {
 
     private Button gpx_resultsBTN, total_resBTN;
-    private String username, gpx_file_res, total_res;
+    private String username, gpx_file_res, user_total_res, server_total_res;
+    private double user_total_time, server_total_time, user_total_distance, server_total_distance, user_total_up_ele, server_total_up_ele;
     private int total_gpxs, total_user_files;
     private AsyncTaskResult client_info;
     private static final String CHANNEL_ID = "my_noti_channel_id";
@@ -43,9 +47,12 @@ public class Activity2 extends AppCompatActivity {
         client_info = (AsyncTaskResult) getIntent().getSerializableExtra("Client_info");
         username = client_info.getUsername();
         gpx_file_res = client_info.getGpx_file_res();
-        total_res = client_info.getTotal_res();
+        user_total_res = client_info.getUser_Total_res();
+        server_total_res = client_info.getServer_total_res();
         total_user_files = client_info.getTotal_user_files();
         total_gpxs = client_info.getTotal_gpxs();
+        // Parses the results of the string file
+        stringParser(user_total_res, false);
 
         showNotification("Got File Results!");
 
@@ -65,11 +72,15 @@ public class Activity2 extends AppCompatActivity {
         total_resBTN.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent new_intent2 = new Intent(Activity2.this, GPX_results.class);
+
+                Intent new_intent2 = new Intent(Activity2.this, Total_results.class);
+                Totals user_totals = new Totals(user_total_res, user_total_time, user_total_distance, user_total_up_ele, total_gpxs);
+                Totals server_totals = new Totals(server_total_res, server_total_time, server_total_distance, server_total_up_ele, total_user_files);
                 new_intent2.putExtra("Username", username);
-                new_intent2.putExtra("Total_res", total_res);
-                new_intent2.putExtra("Total_user_gpxs", total_gpxs);
-                new_intent2.putExtra("Total_user_files", total_user_files);
+                // ----------------------------------------------------------
+                new_intent2.putExtra("User_totals", user_totals);
+                //----------------------------------------------------------
+                new_intent2.putExtra("Server_totals", server_totals);
 
                 startActivity(new_intent2);
             }
@@ -98,46 +109,38 @@ public class Activity2 extends AppCompatActivity {
 
     }
 
+    // If server_checker id true then we initialize the total values of the server
+    // else we initialize the total values of the user
+    private void stringParser(String tot_res, boolean server_checker){
+        BufferedReader reader = new BufferedReader(new StringReader(tot_res));
+        try {
+            String line = reader.readLine();
+            if (line == null) return ;
 
-    /*private void showNotification(String msg) {
-        // Create a notification manager
-        NotificationManager notificationManager =
-                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            if (server_checker){
+                //String tot_time = line.substring(line.indexOf("Total Time: ")+13);
+                server_total_time = Double.parseDouble(line.substring(line.indexOf("Total Time: ")+13));
+                line = reader.readLine();
+                server_total_distance = Double.parseDouble(line.substring(line.indexOf("Total Distance: ")+17));
+                //String tot_dist = line.substring(line.indexOf("Total Distance: ")+17);
+                line = reader.readLine();
+                //String tot_ele = line.substring(line.indexOf("Total Elevation: ")+18);
+                server_total_up_ele = Double.parseDouble(line.substring(line.indexOf("Total Elevation: ")+18));
+            }else{
+                //String tot_time = line.substring(line.indexOf("Total Time: ")+13);
+                user_total_time = Double.parseDouble(line.substring(line.indexOf("Total Time: ")+13));
+                line = reader.readLine();
+                user_total_distance = Double.parseDouble(line.substring(line.indexOf("Total Distance: ")+17));
+                //String tot_dist = line.substring(line.indexOf("Total Distance: ")+17);
+                line = reader.readLine();
+                //String tot_ele = line.substring(line.indexOf("Total Elevation: ")+18);
+                user_total_up_ele = Double.parseDouble(line.substring(line.indexOf("Total Elevation: ")+18));
 
-        // Create a notification channel for Android Oreo and above
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, CHANNEL_NAME,
-                    NotificationManager.IMPORTANCE_DEFAULT);
-            channel.setDescription("My Notification Channel");
-            channel.enableLights(true);
-            channel.setLightColor(Color.CYAN);
-            channel.enableVibration(true);
-            channel.setVibrationPattern(new long[]{100, 1000, 200, 340});
-            channel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
-            notificationManager.createNotificationChannel(channel);
+            }
+
+        }catch (IOException e){
+            e.printStackTrace();
         }
-
-        Intent intent = new Intent(this, Activity2.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
-
-        // Create the notification
-        NotificationCompat.Builder builder =
-                new NotificationCompat.Builder(this, CHANNEL_ID)
-                        .setSmallIcon(R.drawable.ic_launcher_background)
-                        .setStyle(new NotificationCompat.BigPictureStyle())
-                        .setContentTitle("My Notification")
-                        .setContentText(msg)
-                        .setPriority(NotificationCompat.PRIORITY_HIGH)
-                        .setVibrate(new long[]{100, 1000, 200, 340})
-                        .setAutoCancel(false)
-                        .setTicker("Notification")
-                        .setFullScreenIntent(pendingIntent, true);
-
-        builder.setContentIntent(pendingIntent);
-        NotificationManagerCompat nmc = NotificationManagerCompat.from(getApplicationContext());
-        // Show the notification
-        nmc.notify(1, builder.build());
-    }*/
+    }
 
 }

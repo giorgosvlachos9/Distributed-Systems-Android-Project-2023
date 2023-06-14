@@ -143,29 +143,31 @@ public class MainActivity extends AppCompatActivity {
                                         out.writeUTF(file_cont);
                                         out.flush();
                                         // Initialization of the info to return
-                                        String username, gpx_results, total_results;
+                                        String username, gpx_results, user_total_results, server_total_results;
                                         int total_user_files, total_gpxs;
 
                                         while(true) {
 
                                             username = in.readUTF();
                                             gpx_results = in.readUTF();
-                                            total_results = in.readUTF();
+                                            user_total_results = in.readUTF();
+                                            server_total_results = in.readUTF();
                                             total_user_files = in.readInt();
                                             total_gpxs = in.readInt();
-                                            System.out.println("Username : " + username);
+                                            //System.out.println(server_total_results);
+                                            /*System.out.println("Username : " + username);
                                             System.out.println(gpx_results);
-                                            System.out.println(total_results);
+                                            System.out.println(user_total_results);
                                             System.out.println("total_user_files" + total_user_files);
-                                            System.out.println("total_gpxs"+total_gpxs);
+                                            System.out.println("total_gpxs"+total_gpxs);*/
 
 
                                             break;
 
                                         }
 
-                                        AsyncTaskResult atr = new AsyncTaskResult(username, gpx_results, total_results,
-                                                total_user_files, total_gpxs);
+                                        AsyncTaskResult atr = new AsyncTaskResult(username, gpx_results, user_total_results,
+                                                server_total_results, total_user_files, total_gpxs);
 
                                         return atr;
 
