@@ -12,7 +12,7 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
 
         tools:context=".Total_results">
 
@@ -20,14 +20,92 @@
             android:id="@+id/idTVTotalResults"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="28dp"
             android:padding="10dp"
             android:textColor="@color/white"
-            android:textSize="18dp"
+            android:textSize="18sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.498"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <com.github.mikephil.charting.charts.BarChart
+            android:id="@+id/idBCTotalTimeComp"
+            android:layout_width="226dp"
+            android:layout_height="219dp"
+            android:layout_marginStart="184dp"
+            android:layout_marginTop="124dp"
+            android:layout_marginEnd="177dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.54"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/idTVTotalResults" />
+
+        <com.github.mikephil.charting.charts.BarChart
+            android:id="@+id/idBCTotalDistComp"
+            android:layout_width="220dp"
+            android:layout_height="213dp"
+            android:layout_marginStart="184dp"
+            android:layout_marginTop="108dp"
+            android:layout_marginEnd="177dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.552"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/idBCTotalTimeComp" />
+
+        <com.github.mikephil.charting.charts.BarChart
+            android:id="@+id/idBCTotalUpEleComp"
+            android:layout_width="226dp"
+            android:layout_height="221dp"
+            android:layout_marginStart="184dp"
+            android:layout_marginTop="108dp"
+            android:layout_marginEnd="177dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.534"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/idBCTotalDistComp" />
+
+        <TextView
+            android:id="@+id/idTVTotalTimeComp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="44dp"
+            android:text="Total Time Comparison"
+            android:fontFamily="sans-serif-black"
+            android:textSize="15sp"
+            android:textColor="@color/white"
+            app:layout_constraintBottom_toTopOf="@+id/idBCTotalTimeComp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <TextView
+            android:id="@+id/idTVTotalDistComp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="44dp"
+            android:text="Total Distance Comparison"
+            android:fontFamily="sans-serif-black"
+            android:textSize="15sp"
+            android:textColor="@color/white"
+            app:layout_constraintBottom_toTopOf="@+id/idBCTotalDistComp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <TextView
+            android:id="@+id/idTVTotalUpEleComp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="44dp"
+            android:text="Total Up Elevation Comparison"
+            android:fontFamily="sans-serif-black"
+            android:textSize="15sp"
+            android:textColor="@color/white"
+            app:layout_constraintBottom_toTopOf="@+id/idBCTotalUpEleComp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.498"
+            app:layout_constraintStart_toStartOf="parent" />
+
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </ScrollView>

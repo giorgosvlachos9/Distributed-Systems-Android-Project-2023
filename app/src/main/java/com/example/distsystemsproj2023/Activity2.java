@@ -2,33 +2,26 @@ package com.example.distsystemsproj2023;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.app.PendingIntent;
 import android.content.Intent;
 import android.graphics.Color;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
-import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.os.Build;
 import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.StringReader;
-import java.net.Socket;
 
 public class Activity2 extends AppCompatActivity {
 
     private Button gpx_resultsBTN, total_resBTN;
     private String username, gpx_file_res, user_total_res, server_total_res;
+    private Totals user_totals, server_totals;
     private double user_total_time, server_total_time, user_total_distance, server_total_distance, user_total_up_ele, server_total_up_ele;
     private int total_gpxs, total_user_files;
     private AsyncTaskResult client_info;
@@ -53,8 +46,11 @@ public class Activity2 extends AppCompatActivity {
         total_gpxs = client_info.getTotal_gpxs();
         // Parses the results of the string file
         stringParser(user_total_res, false);
+        stringParser(server_total_res, true);
 
         showNotification("Got File Results!");
+
+        // minutes  kms meters meters/minute
 
 
 
@@ -74,8 +70,8 @@ public class Activity2 extends AppCompatActivity {
             public void onClick(View view) {
 
                 Intent new_intent2 = new Intent(Activity2.this, Total_results.class);
-                Totals user_totals = new Totals(user_total_res, user_total_time, user_total_distance, user_total_up_ele, total_gpxs);
-                Totals server_totals = new Totals(server_total_res, server_total_time, server_total_distance, server_total_up_ele, total_user_files);
+                user_totals = new Totals(user_total_res, user_total_time, user_total_distance, user_total_up_ele, total_gpxs);
+                server_totals = new Totals(server_total_res, server_total_time, server_total_distance, server_total_up_ele, total_user_files);
                 new_intent2.putExtra("Username", username);
                 // ----------------------------------------------------------
                 new_intent2.putExtra("User_totals", user_totals);
@@ -83,9 +79,25 @@ public class Activity2 extends AppCompatActivity {
                 new_intent2.putExtra("Server_totals", server_totals);
 
                 startActivity(new_intent2);
+
             }
         });
 
+    }
+
+    @Override
+    public void onBackPressed(){
+        //super.onBackPressed();
+
+        Intent new_int = new Intent();
+        new_int.putExtra("Username", username);
+        // ----------------------------------------------------------
+        new_int.putExtra("User_totals", user_totals);
+        //----------------------------------------------------------
+        new_int.putExtra("Server_totals", server_totals);
+
+        setResult(RESULT_OK, new_int);
+        finish();
     }
 
     private void showNotification(String msg){
@@ -118,23 +130,23 @@ public class Activity2 extends AppCompatActivity {
             if (line == null) return ;
 
             if (server_checker){
-                //String tot_time = line.substring(line.indexOf("Total Time: ")+13);
-                server_total_time = Double.parseDouble(line.substring(line.indexOf("Total Time: ")+13));
+                String temp = "Total Time (in Minutes) : ";
+                server_total_time = Double.parseDouble(line.substring(line.indexOf(temp)+temp.length()+1));
                 line = reader.readLine();
-                server_total_distance = Double.parseDouble(line.substring(line.indexOf("Total Distance: ")+17));
-                //String tot_dist = line.substring(line.indexOf("Total Distance: ")+17);
+                temp = "Total Distance (in Kilometers) :";
+                server_total_distance = Double.parseDouble(line.substring(line.indexOf(temp)+temp.length()+1));
                 line = reader.readLine();
-                //String tot_ele = line.substring(line.indexOf("Total Elevation: ")+18);
-                server_total_up_ele = Double.parseDouble(line.substring(line.indexOf("Total Elevation: ")+18));
+                temp = "Total Elevation (in Meters) : ";
+                server_total_up_ele = Double.parseDouble(line.substring(line.indexOf(temp)+temp.length()+1));
             }else{
-                //String tot_time = line.substring(line.indexOf("Total Time: ")+13);
-                user_total_time = Double.parseDouble(line.substring(line.indexOf("Total Time: ")+13));
+                String temp = "Total Time (in Minutes) : ";
+                user_total_time = Double.parseDouble(line.substring(line.indexOf(temp)+temp.length()+1));
                 line = reader.readLine();
-                user_total_distance = Double.parseDouble(line.substring(line.indexOf("Total Distance: ")+17));
-                //String tot_dist = line.substring(line.indexOf("Total Distance: ")+17);
+                temp = "Total Distance (in Kilometers) :";
+                user_total_distance = Double.parseDouble(line.substring(line.indexOf(temp)+temp.length()+1));
                 line = reader.readLine();
-                //String tot_ele = line.substring(line.indexOf("Total Elevation: ")+18);
-                user_total_up_ele = Double.parseDouble(line.substring(line.indexOf("Total Elevation: ")+18));
+                temp = "Total Elevation (in Meters) : ";
+                user_total_up_ele = Double.parseDouble(line.substring(line.indexOf(temp)+temp.length()+1));
 
             }
 

@@ -2,58 +2,39 @@ package com.example.distsystemsproj2023;
 
 import androidx.activity.result.ActivityResult;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.content.Context;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
-import android.util.Pair;
 import android.view.View;
 import android.widget.*;
 import android.Manifest;
 
-import android.Manifest;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.net.Socket;
-import java.util.Random;
 
-import android.util.Log;
+
 
 public class MainActivity extends AppCompatActivity {
 
-    private TextView welcomeTV, fileSelTV;
-    private Button choose_fileBTN, uploadBTN;
+    private TextView welcomeTV, fileSelTV, totalResHelper;
+    private Button choose_fileBTN, uploadBTN, goToTotalsBTN;
+
+    private boolean check_totals = false;
+    private String username;
+    private Totals user_totals, server_totals;
 
 
     private static final int FILE_REQUEST_CODE = 1;
@@ -71,6 +52,20 @@ public class MainActivity extends AppCompatActivity {
         fileSelTV = (TextView) findViewById(R.id.idTVFileSelected);
         choose_fileBTN = (Button) findViewById(R.id.idBSelectFile);
         uploadBTN = (Button) findViewById(R.id.idBUpload);
+        goToTotalsBTN = (Button) findViewById(R.id.idBTNGoToTotals);
+
+        goToTotalsBTN.setOnClickListener(v -> {
+            if (!check_totals){
+                Toast.makeText(MainActivity.this, "Have to upload file first", Toast.LENGTH_LONG).show();
+            }else{
+                Intent intent_tot = new Intent(MainActivity.this, Total_results.class);
+                intent_tot.putExtra("Username", username);
+                intent_tot.putExtra("User_totals", user_totals);
+                intent_tot.putExtra("Server_totals", server_totals);
+
+                startActivity(intent_tot);
+            }
+        });
 
 
         choose_fileBTN.setOnClickListener(v -> {
@@ -83,8 +78,20 @@ public class MainActivity extends AppCompatActivity {
 
         fileChooserLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), this::handleFileSelectionResult);
 
+    }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1 && resultCode == RESULT_OK) {
+            resetActivity();
 
+            username = data.getStringExtra("Username");
+            user_totals = (Totals) data.getSerializableExtra("User_totals");
+            server_totals = (Totals) data.getSerializableExtra("Server_totals");
+            check_totals = true;
+
+        }
     }
 
     private boolean checkPermission() {
@@ -109,12 +116,10 @@ public class MainActivity extends AppCompatActivity {
         if (result.getResultCode() == RESULT_OK && result.getData() != null) {
             Uri fileUri = result.getData().getData();
 
-            System.out.println("Gia na ddoyme");
-
             fileSelTV.setText("File Successfully selected");
 
             String file_contents = createFileString(fileUri);
-            System.out.println(file_contents);
+
 
 
             uploadBTN.setVisibility(View.VISIBLE);
@@ -132,6 +137,7 @@ public class MainActivity extends AppCompatActivity {
                                 @Override
                                 protected AsyncTaskResult doInBackground(String... strings) {
                                     try{
+
                                         Socket s = new Socket("192.168.56.1", 4320);
                                         /* Create the streams to send and receive data from server */
                                         ObjectOutputStream out = new ObjectOutputStream(s.getOutputStream());
@@ -154,13 +160,6 @@ public class MainActivity extends AppCompatActivity {
                                             server_total_results = in.readUTF();
                                             total_user_files = in.readInt();
                                             total_gpxs = in.readInt();
-                                            //System.out.println(server_total_results);
-                                            /*System.out.println("Username : " + username);
-                                            System.out.println(gpx_results);
-                                            System.out.println(user_total_results);
-                                            System.out.println("total_user_files" + total_user_files);
-                                            System.out.println("total_gpxs"+total_gpxs);*/
-
 
                                             break;
 
@@ -183,7 +182,7 @@ public class MainActivity extends AppCompatActivity {
 
                                     Intent intent = new Intent(MainActivity.this, Activity2.class);
                                     intent.putExtra("Client_info", as_task);
-                                    startActivity(intent);
+                                    startActivityForResult(intent,1);
 
 
                                     //showNotification("File results are waiting for you!");
@@ -241,6 +240,11 @@ public class MainActivity extends AppCompatActivity {
 
         return sb.toString();
 
+    }
+
+    private void resetActivity(){
+        fileSelTV.setText("No File Selected");
+        uploadBTN.setVisibility(View.GONE);
     }
 
 
