@@ -1,9 +1,11 @@
 package com.example.distsystemsproj2023;
 
 import androidx.activity.result.ActivityResult;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -38,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     private static final int FILE_REQUEST_CODE = 1;
-    private static final int PERMISSION_REQUEST_CODE = 2;
+    private static final int PERMISSION_REQUEST_CODE = 1;
 
     private ActivityResultLauncher<Intent> fileChooserLauncher;
 
@@ -54,6 +56,25 @@ public class MainActivity extends AppCompatActivity {
         uploadBTN = (Button) findViewById(R.id.idBUpload);
         goToTotalsBTN = (Button) findViewById(R.id.idBTNGoToTotals);
 
+
+        choose_fileBTN.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (ContextCompat.checkSelfPermission(MainActivity.this,
+                        Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+                    Toast.makeText(MainActivity.this, "You have already granted this permission!",
+                            Toast.LENGTH_SHORT).show();
+                    openFileChooser();
+                } else {
+                    requestPermission();
+                }
+            }
+        });
+
+
+
+        fileChooserLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), this::handleFileSelectionResult);
+
         goToTotalsBTN.setOnClickListener(v -> {
             if (!check_totals){
                 Toast.makeText(MainActivity.this, "Have to upload file first", Toast.LENGTH_LONG).show();
@@ -66,17 +87,6 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent_tot);
             }
         });
-
-
-        choose_fileBTN.setOnClickListener(v -> {
-            if (checkPermission()) {
-                openFileChooser();
-            } else {
-                requestPermission();
-            }
-        });
-
-        fileChooserLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), this::handleFileSelectionResult);
 
     }
 
@@ -95,14 +105,36 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private boolean checkPermission() {
-        return ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
+        return ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE)
                 == PackageManager.PERMISSION_GRANTED;
     }
 
     private void requestPermission() {
-        ActivityCompat.requestPermissions(this,
-                new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                PERMISSION_REQUEST_CODE);
+        if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                Manifest.permission.READ_EXTERNAL_STORAGE)) {
+
+            new AlertDialog.Builder(this)
+                    .setTitle("Permission needed")
+                    .setMessage("This permission is needed because of this and that")
+                    .setPositiveButton("ok", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            ActivityCompat.requestPermissions(MainActivity.this,
+                                    new String[] {Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSION_REQUEST_CODE);
+                        }
+                    })
+                    .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    })
+                    .create().show();
+
+        } else {
+            ActivityCompat.requestPermissions(this,
+                    new String[] {Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSION_REQUEST_CODE);
+        }
     }
 
     private void openFileChooser() {
@@ -202,14 +234,15 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
-        if (requestCode == PERMISSION_REQUEST_CODE) {
+        if (requestCode == PERMISSION_REQUEST_CODE)  {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this, "Permission GRANTED", Toast.LENGTH_SHORT).show();
                 openFileChooser();
             } else {
-                Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Permission DENIED", Toast.LENGTH_SHORT).show();
             }
         }
+
     }
 
     private String createFileString(Uri f_Uri){
